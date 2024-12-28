@@ -1,21 +1,50 @@
 # CPU-Architecture-Bungo-3
+
 ## Project Overview
-This is a CPU architecture digital design project. This project aims to create a functional 9-bit op-code CPU architecture capable of running basic programs and should also be fully programmable for a programmer using the ISA it provides.
-Because of the strict 9-bit opcode limitation, we have to be creative with many of our assembly commands to achieve most of a CPU's major functionality while keeping the op code short. We are also limited to 8-bit wide data stored in a register, so we have to separate a number like int into low byte and high byte if needed.
+This project focuses on the design and implementation of a CPU architecture. The goal is to create a functional 9-bit opcode CPU capable of executing basic programs while being fully programmable via its Instruction Set Architecture (ISA). Due to the strict 9-bit opcode limitation, innovative techniques were employed to implement essential CPU functionalities. Data is stored in 8-bit wide registers, requiring separation into low and high bytes for larger numbers.
+
 ![RTL viewer](https://github.com/user-attachments/assets/66da85ec-b060-4730-827a-a66d05f7e9ae)
-The included files have the hardware written in System Verilog, some test benches with the assembly code, and an assembler that translates assembly code to machine code.
 
-## Design principle
-This project has created a CPU architecture based on the Minimum instruction set principle. The MIPS is designed to have 9 bits of instructions. The opcodes are floating code and all instructions are designed with Huffman encoding to make sure that our float opcode works. A MIPS instruction sheet is provided to the programmer for ease of programming. The general design principle is to optimize the performance of the CPU by reducing as much memory I/O as possible. To achieve such an effect, a register to register machine is preferred here because memory I/O is a lot slower than moving data between registers which typically takes 1 clock cycle. Thus, we want to have as many registers in this architecture as possible while still having all the basical instructions necessary to performant most of the task. I decided to have 8 registers for my architecture. There are instructions with 0, 1, and 2 registers included for ease of programming. For instance, store command `sti` is coded with 0 registers because we load and store to reg 0 by default. Reg 0 is our dedicated load and store register. 
+The repository includes:
+- System Verilog files for the hardware design.
+- Test benches with assembly code.
+- An assembler to translate assembly code into machine code.
 
-## Register purpose
-In general, register 0 is our load/store register. It is the default location where data will be loaded to and stored from when using the `ldi` and `sti` commands.
-Register 1-Register 3 are our general-purpose registers. Most of the operations are done with these registers. In fact, some instruction only support operations on these lower 2-bit registers because of the limitation of our instructions' length.
-Register 4-6 are typically reserved for looping variants. These are like our counter registers, usually reserved for looping only. If they are not in use by a loop, the programmer can choose to `mov` data from one register into another. Yet many arithmetic operations actually do not support these registers, so use them with caution.
-Register 7 stores the flags from the ALU, like zero flag, negative flag, and carry flag. It will be updated after the ALU performs things like `cmp` or `sub`. This register will be helpful for the programmer to determine the Jumping/branching conditions if needed.
+## Design Principles
+The CPU is built using the Minimum Instruction Set Principle (MISP), emphasizing efficiency in memory and instruction usage. The design features:
+- A 9-bit opcode with floating codes.
+- Huffman-encoded instructions for optimal opcode usage.
+- A MIPS-style instruction sheet for ease of programming.
+
+To optimize performance, the architecture minimizes memory I/O, favoring register-to-register operations, which typically take one clock cycle. The design includes 8 registers, balancing functionality and instruction length constraints. Instruction formats with 0, 1, or 2 registers are provided for programming flexibility. For example:
+- The `sti` command is designed with 0 registers, defaulting to register 0 for load/store operations.
+
+## Register Purpose
+- **Register 0**: Dedicated load/store register for `ldi` and `sti` commands.
+- **Registers 1-3**: General-purpose registers for most operations. Some instructions only support these lower 2-bit registers due to opcode limitations.
+- **Registers 4-6**: Reserved for loop counters but can be used for other purposes with `mov`. Arithmetic operations may not support these registers.
+- **Register 7**: Stores ALU flags (zero, negative, carry) updated after ALU operations like `cmp` or `sub`. Useful for branching conditions.
+
+## Branching and Look-Up Table (LUT)
+Branching is constrained by the 9-bit opcode, where 7 bits are used for immediate addressing. To address this, a LUT is implemented:
+- The assembler records label locations and their immediate addresses, outputting a LUT.
+- Branching commands reference the LUT pointer to retrieve the actual target address.
 
 ## Setup
+1. **Synthesize Components**: Use Quartus Prime to synthesize the design. Create a new project and include the `top_level.sv` file.
+   - The design was tested using the Arria II GX family FPGA.
+2. **Run Code**:
+   - Write assembly code based on the instruction sheet.
+   - Use `assembly.py` to translate assembly code into machine code.
+   - Load the machine code into the testbench for execution.
 
+## Testing
+The provided testbench verifies the architecture’s functionality by executing a program to find the greatest and least Hamming pairs. It:
+- Provides a start signal.
+- Loads machine code into instruction memory.
+- Tests 10 different inputs.
+- Verifies correctness against expected outputs.
 
 ## Results
+The testbench successfully validated the architecture’s functionality. All 10 test cases for finding the greatest and least Hamming pairs passed in Questa simulations, demonstrating the design’s correctness and reliability.
 

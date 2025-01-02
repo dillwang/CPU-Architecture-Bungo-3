@@ -31,11 +31,12 @@ Branching is constrained by the 9-bit opcode, where 7 bits are used for immediat
 - Branching commands reference the LUT pointer to retrieve the actual target address.
 
 ## Setup
-1. **Synthesize Components**: Use Quartus Prime to synthesize the design. Create a new project and include the `top_level.sv` file.
+1. **Synthesize Components**: Use Quartus Prime to synthesize the design. Create a new project and include the `top_level.sv` file and all necessary System Verilog component files.
    - The design was tested using the Arria II GX family FPGA.
 2. **Run Code**:
    - Write assembly code based on the instruction sheet.
    - Use `assembly.py` to translate assembly code into machine code.
+   - Use simulation software like Intel Questa or modelSim to simulate the waveform viewer and transcript output.
    - Load the machine code into the testbench for execution.
 
 ## Testing
